@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  docshield-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docshield-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MAX_IN_MEMORY_FILE_SIZE_MB=15
+      - ENFORCE_RAM_ONLY_CLEANUP=true
+    restart: unless-stopped

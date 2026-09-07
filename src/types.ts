@@ -88,6 +88,41 @@ export interface ExifReport {
   tamperWarning: string | null;
 }
 
+export interface GovernmentGatewayVerification {
+  authority: string;
+  gatewayStatus: 'VERIFIED_ACTIVE' | 'RECORD_NOT_FOUND' | 'INTEGRITY_MISMATCH' | 'SUSPENDED';
+  apiEndpoint: string;
+  responseLatencyMs: number;
+  digitalSignatureVerified: boolean;
+  pkiCertificateIssuer: string;
+  matchRecords: {
+    identityStatus: 'ACTIVE_VALID' | 'INVALID_OR_NOT_FOUND';
+    nameMatchPercentage: number;
+    dobVerified: boolean;
+    genderVerified: boolean;
+    jurisdiction: string;
+  };
+  auditReferenceId: string;
+}
+
+export interface BlockchainVerification {
+  network: 'Ethereum Mainnet' | 'Polygon PoS Identity Ledger' | 'GovChain India Hyperledger Fabric';
+  contractAddress: string;
+  transactionHash: string;
+  blockNumber: number;
+  merkleRoot: string;
+  merkleProofVerified: boolean;
+  zeroKnowledgeProof: {
+    scheme: 'zk-SNARK (Groth16)' | 'zk-STARK';
+    circuit: string;
+    isValid: boolean;
+    publicInputsHash: string;
+  };
+  revocationStatus: 'ACTIVE_UNREVOKED' | 'REVOKED';
+  documentDigestSha256: string;
+  timestamp: string;
+}
+
 export interface ScreeningReport {
   id: string;
   timestamp: string;
@@ -102,6 +137,7 @@ export interface ScreeningReport {
   riskLevel: RiskLevel;
   decision: DecisionType;
   recommendation: string;
+  reasons?: string[];
 
   // Breakdown sub-scores (0-100)
   subScores: {
@@ -116,6 +152,10 @@ export interface ScreeningReport {
   forensicSignals: ForensicSignal[];
   biometrics: BiometricAnalysis;
   exif: ExifReport;
+
+  // Live Government Gateway & Blockchain Cybersecurity Ledger
+  governmentGateway?: GovernmentGatewayVerification;
+  blockchain?: BlockchainVerification;
 
   // Compliance checks
   compliance: {

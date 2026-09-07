@@ -11,7 +11,7 @@ import { PipelineProgress } from './components/PipelineProgress';
 import { ResultsView } from './components/ResultsView';
 import { ComplianceModal } from './components/ComplianceModal';
 import { AboutUsModal } from './components/AboutUsModal';
-import { DocumentType, ScreeningReport, AuditLogEntry, SampleDocumentPreset } from './types';
+import { DocumentType, ScreeningReport, AuditLogEntry } from './types';
 import { runScreeningPipeline } from './services/analyzer';
 
 // Initial in-memory audit logs for realistic demonstration
@@ -79,17 +79,22 @@ export default function App() {
     selfieImage: string;
     docType: DocumentType;
     fileName: string;
-    preset?: SampleDocumentPreset;
+    idNumberInput?: string;
+    fullNameInput?: string;
+    dobInput?: string;
   } | null>(null);
 
-  // Triggered when user clicks "Run Forensic Screening"
+  // Triggered when user clicks "Run Forensic Screening" / "Verify Document"
   const handleStartScreening = (params: {
     docImage: string;
     selfieImage: string;
     docType: DocumentType;
     fileName: string;
-    preset?: SampleDocumentPreset;
+    idNumberInput?: string;
+    fullNameInput?: string;
+    dobInput?: string;
   }) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setPendingParams(params);
     setIsProcessing(true);
     setCurrentReport(null);
@@ -108,10 +113,22 @@ export default function App() {
         selfieImageUrl: pendingParams.selfieImage,
         docTypeHint: pendingParams.docType,
         fileName: pendingParams.fileName,
-        presetData: pendingParams.preset?.mockData
+        idNumberInput: pendingParams.idNumberInput,
+        fullNameInput: pendingParams.fullNameInput,
+        dobInput: pendingParams.dobInput
       });
 
       setCurrentReport(report);
+
+      // Immediately redirect and scroll smoothly to document score section
+      setTimeout(() => {
+        const scoreSection = document.getElementById('document-score-section');
+        if (scoreSection) {
+          scoreSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 50);
 
       // Record in memory audit log (strictly metadata, NO image bytes!)
       const newAuditLog: AuditLogEntry = {
@@ -139,6 +156,7 @@ export default function App() {
     setCurrentReport(null);
     setIsProcessing(false);
     setPendingParams(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

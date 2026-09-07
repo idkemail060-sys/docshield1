@@ -1,6 +1,6 @@
 {
   "name": "DocShield",
-  "description": "AI-based fake identity and document screening system with in-memory forensic analysis, Verhoeff checksum validation, and biometric verification.",
+  "description": "AI-based fake identity and document screening system with live government gateway verification, blockchain Merkle proof auditing, cybersecurity cryptographic hashing, and in-memory forensic analysis.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

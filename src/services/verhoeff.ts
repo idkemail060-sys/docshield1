@@ -67,6 +67,29 @@ export function generateVerhoeffCheckDigit(numStr: string): number {
 }
 
 /**
+ * Creates a valid 12-digit Aadhaar number with correct Verhoeff check digit
+ */
+export function createValidAadhaarNumber(prefix11 = '36759834501'): string {
+  const clean = prefix11.replace(/[\s-]+/g, '').slice(0, 11);
+  const padded = clean.padEnd(11, '0');
+  const checkDigit = generateVerhoeffCheckDigit(padded);
+  const full = padded + checkDigit;
+  return `${full.slice(0, 4)} ${full.slice(4, 8)} ${full.slice(8, 12)}`;
+}
+
+/**
+ * Generates an invalid 12-digit Aadhaar number with intentionally corrupted check digit for fraud testing
+ */
+export function createInvalidAadhaarNumber(prefix11 = '36759834501'): string {
+  const clean = prefix11.replace(/[\s-]+/g, '').slice(0, 11);
+  const padded = clean.padEnd(11, '0');
+  const checkDigit = generateVerhoeffCheckDigit(padded);
+  const corruptDigit = (checkDigit + 1) % 10;
+  const full = padded + corruptDigit;
+  return `${full.slice(0, 4)} ${full.slice(4, 8)} ${full.slice(8, 12)}`;
+}
+
+/**
  * Indian PAN Card format validation:
  * Must be 10 characters: 5 uppercase letters + 4 digits + 1 uppercase letter.
  * 4th character denotes entity type (P = Individual, C = Company, etc.)
@@ -144,4 +167,46 @@ export function computeMrzCheckDigit(mrzStr: string): number {
     sum += val * weights[i % 3];
   }
   return sum % 10;
+}
+
+/**
+ * Validates Indian Voter ID (EPIC) Number format:
+ * Standard format: 3 uppercase letters followed by 7 numeric digits (e.g. ABC1234567).
+ */
+export function validateVoterId(voterIdStr: string): { isValid: boolean; message: string } {
+  const clean = voterIdStr.trim().toUpperCase().replace(/[\s-]+/g, '');
+  const epicRegex = /^[A-Z]{3}[0-9]{7}$/;
+
+  if (!epicRegex.test(clean)) {
+    return {
+      isValid: false,
+      message: 'Invalid Voter ID format: Expected 3 letters + 7 digits (e.g. ABC1234567)'
+    };
+  }
+
+  return {
+    isValid: true,
+    message: 'Valid Election Commission of India (ECI) EPIC format'
+  };
+}
+
+/**
+ * Validates Indian Driving License format:
+ * Standard format: 2 letters state code + RTO code + year + 7 digits serial
+ */
+export function validateDrivingLicense(dlStr: string): { isValid: boolean; message: string } {
+  const clean = dlStr.trim().toUpperCase().replace(/[\s-]+/g, '');
+  const dlRegex = /^[A-Z]{2}[0-9]{2}[0-9]{4}[0-9]{7}$|^[A-Z]{2}[0-9]{13}$/;
+
+  if (!dlRegex.test(clean)) {
+    return {
+      isValid: false,
+      message: 'Invalid Driving License format: Expected state code + RTO + Year + 7 digits (e.g. DL-1420110012345)'
+    };
+  }
+
+  return {
+    isValid: true,
+    message: 'Valid Ministry of Road Transport and Highways (MoRTH / SARATHI) format'
+  };
 }

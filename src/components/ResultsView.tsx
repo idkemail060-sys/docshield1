@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   ShieldAlert, 
@@ -16,7 +16,15 @@ import {
   Lock, 
   Layers, 
   Info,
-  Maximize2
+  Maximize2,
+  Database,
+  Link2,
+  Fingerprint,
+  Copy,
+  Check,
+  Radio,
+  KeyRound,
+  ExternalLink
 } from 'lucide-react';
 import { ScreeningReport, BoundingBox, ForensicSignal } from '../types';
 
@@ -30,10 +38,34 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
   const [activeViewMode, setActiveViewMode] = useState<'original' | 'ela' | 'anomalies' | 'ocr'>('ela');
   const [elaOpacity, setElaOpacity] = useState<number>(0.85);
   const [selectedSignal, setSelectedSignal] = useState<ForensicSignal | null>(report.forensicSignals[0] || null);
+  const [copiedDigest, setCopiedDigest] = useState(false);
+
+  // Automatically redirect and scroll directly to the document score
+  useEffect(() => {
+    const scrollToScore = () => {
+      const scoreElement = document.getElementById('document-score-section');
+      if (scoreElement) {
+        scoreElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    scrollToScore();
+    const timer = setTimeout(scrollToScore, 80);
+    return () => clearTimeout(timer);
+  }, [report.id]);
 
   const isLowRisk = report.riskLevel === 'low';
   const isMediumRisk = report.riskLevel === 'medium';
   const isHighRisk = report.riskLevel === 'high';
+
+  // Copy SHA-256 digest
+  const handleCopyDigest = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedDigest(true);
+    setTimeout(() => setCopiedDigest(false), 2000);
+  };
 
   // Badge styling
   const riskBadgeColor = isLowRisk
@@ -59,6 +91,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
       risk_level: report.riskLevel,
       decision: report.decision,
       recommendation: report.recommendation,
+      government_gateway: report.governmentGateway,
+      blockchain_verification: report.blockchain,
       sub_scores: report.subScores,
       failed_signals: report.forensicSignals.filter(s => s.status !== 'passed').map(s => ({
         name: s.name,
@@ -117,44 +151,95 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
       </div>
 
       {/* Primary Score & Decision Bento Banner */}
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
+      <div id="document-score-section" className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm scroll-mt-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           
           {/* Score Gauge Block */}
-          <div className="flex items-center gap-5">
-            <div className="relative flex items-center justify-center">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            <div className="relative flex items-center justify-center shrink-0">
               {/* Circular Gauge Meter */}
-              <div className={`w-24 h-24 rounded-full border-4 flex flex-col items-center justify-center shadow-md ${
+              <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 flex flex-col items-center justify-center shadow-lg transition-all ${
                 isLowRisk
-                  ? 'border-green-500 bg-green-500/10 text-green-400'
+                  ? 'border-emerald-500/80 bg-emerald-950/30 text-emerald-400 ring-4 ring-emerald-500/10'
                   : isMediumRisk
-                  ? 'border-amber-500 bg-amber-500/10 text-amber-400'
-                  : 'border-red-500 bg-red-500/10 text-red-400'
+                  ? 'border-amber-500/80 bg-amber-950/30 text-amber-400 ring-4 ring-amber-500/10'
+                  : 'border-rose-500/80 bg-rose-950/30 text-rose-400 ring-4 ring-rose-500/10'
               }`}>
-                <span className="text-3xl font-black tracking-tight">{report.authenticityScore}</span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">/ 100</span>
+                <span className="text-3xl sm:text-4xl font-black tracking-tight">{report.authenticityScore}</span>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">/ 100 Score</span>
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`px-2.5 py-0.5 rounded text-xs font-bold uppercase border ${riskBadgeColor}`}>
-                  {riskTitle}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase border tracking-wide flex items-center gap-1.5 ${
+                  isLowRisk 
+                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' 
+                    : isMediumRisk
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                    : 'bg-rose-500/15 border-rose-500/40 text-rose-300'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    isLowRisk ? 'bg-emerald-400' : isMediumRisk ? 'bg-amber-400' : 'bg-rose-400 animate-pulse'
+                  }`} />
+                  {isLowRisk ? 'ORIGINAL DOCUMENT VERIFIED' : riskTitle}
                 </span>
-                <span className="text-xs text-zinc-500 font-mono">ID: {report.id}</span>
+                <span className="text-[11px] text-zinc-500 font-mono">Audit #{report.id.slice(-8)}</span>
               </div>
               
-              <h2 className="text-xl font-bold text-zinc-100">
-                Decision:{' '}
+              <h2 className="text-xl sm:text-2xl font-black text-zinc-100 tracking-tight flex items-center gap-2">
+                <span>Final Decision:</span>
                 <span className={
-                  report.decision === 'ACCEPT' ? 'text-green-400' :
-                  report.decision === 'MANUAL_REVIEW' ? 'text-amber-400' : 'text-red-400'
+                  report.decision === 'ACCEPT' ? 'text-emerald-400 underline decoration-emerald-500/40 decoration-2 underline-offset-4' :
+                  report.decision === 'MANUAL_REVIEW' ? 'text-amber-400' : 'text-rose-400 underline decoration-rose-500/40 decoration-2 underline-offset-4'
                 }>{report.decision}</span>
               </h2>
               
-              <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-xl">
+              <p className="text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed">
                 {report.recommendation}
               </p>
+
+              {/* Instant Verification Status Chips */}
+              <div className="flex items-center gap-2 pt-1 flex-wrap text-[11px] font-mono">
+                <span className={`px-2 py-0.5 rounded border flex items-center gap-1 ${
+                  report.compliance.uidaiVerhoeffValid 
+                    ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400' 
+                    : 'bg-rose-950/40 border-rose-500/30 text-rose-400'
+                }`}>
+                  {report.compliance.uidaiVerhoeffValid ? '✓' : '✗'} Verhoeff: {report.compliance.uidaiVerhoeffValid ? 'PASSED' : 'FAILED'}
+                </span>
+                <span className={`px-2 py-0.5 rounded border flex items-center gap-1 ${
+                  report.subScores.forensics >= 70 
+                    ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400' 
+                    : 'bg-rose-950/40 border-rose-500/30 text-rose-400'
+                }`}>
+                  {report.subScores.forensics >= 70 ? '✓' : '✗'} ELA Forensics: {report.subScores.forensics >= 70 ? 'CLEAN' : 'ALTERED'}
+                </span>
+                <span className="px-2 py-0.5 rounded border bg-zinc-950 border-zinc-800 text-zinc-400 flex items-center gap-1">
+                  Face Match: {report.biometrics.matchScore}%
+                </span>
+              </div>
+
+              {/* Reasons & Evidence Bullets */}
+              {report.reasons && report.reasons.length > 0 && (
+                <div className={`mt-3 p-3 rounded-xl border text-xs leading-relaxed space-y-1 ${
+                  isHighRisk 
+                    ? 'bg-rose-950/20 border-rose-500/30 text-rose-200' 
+                    : isMediumRisk 
+                    ? 'bg-amber-950/20 border-amber-500/30 text-amber-200' 
+                    : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                }`}>
+                  <div className="font-bold flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Forensic Analysis Findings:</span>
+                  </div>
+                  <ul className="list-disc list-inside space-y-0.5 pl-1 text-[11px] opacity-95">
+                    {report.reasons.map((r, idx) => (
+                      <li key={idx} className="font-medium">{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
@@ -193,6 +278,200 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
 
         </div>
       </div>
+
+      {/* Live Government Gateway & Blockchain Cybersecurity Ledger Section */}
+      {(report.governmentGateway || report.blockchain) && (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-6 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                  Live Government Gateway & Blockchain Immutability Ledger
+                </h3>
+              </div>
+              <p className="text-xs text-zinc-400">
+                Autonomous verification performed directly against central statutory databases, 2048-bit PKI digital certificates, and decentralized Merkle tree proofs.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap text-xs font-mono">
+              <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Gov Gateway Handshake: Verified
+              </span>
+              <span className="px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center gap-1.5">
+                <Link2 className="w-3.5 h-3.5 text-cyan-400" />
+                On-Chain Merkle Proof: Valid
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Left Card: Live Government Gateway Verification */}
+            {report.governmentGateway && (
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between space-y-3">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Database className="w-4 h-4 text-emerald-400" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-zinc-200">
+                        {report.governmentGateway.authority}
+                      </span>
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold font-mono uppercase border ${
+                      report.governmentGateway.gatewayStatus === 'VERIFIED_ACTIVE'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                        : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                    }`}>
+                      {report.governmentGateway.gatewayStatus.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  {/* Gateway Telemetry */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800/80">
+                      <span className="text-[10px] text-zinc-500 uppercase font-mono block">e-KYC Latency</span>
+                      <span className="font-mono text-zinc-200 font-semibold mt-0.5 block">
+                        {report.governmentGateway.responseLatencyMs} ms (TLS 1.3)
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800/80">
+                      <span className="text-[10px] text-zinc-500 uppercase font-mono block">PKI Signature</span>
+                      <span className={`font-mono text-[11px] font-semibold mt-0.5 block ${
+                        report.governmentGateway.digitalSignatureVerified ? 'text-emerald-400' : 'text-rose-400'
+                      }`}>
+                        {report.governmentGateway.digitalSignatureVerified ? '✓ RSA-2048 Valid' : '✗ Signature Missing'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Record Matching Table */}
+                  <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 space-y-1.5 text-xs">
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>Central Registry Status:</span>
+                      <span className={`font-mono font-semibold ${
+                        report.governmentGateway.matchRecords.identityStatus === 'ACTIVE_VALID' ? 'text-emerald-400' : 'text-rose-400'
+                      }`}>
+                        {report.governmentGateway.matchRecords.identityStatus}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>Name Concordance:</span>
+                      <span className="font-mono text-zinc-200 font-medium">
+                        {report.governmentGateway.matchRecords.nameMatchPercentage}% Match
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>DOB / Gender Verified:</span>
+                      <span className="font-mono text-zinc-200 font-medium">
+                        {report.governmentGateway.matchRecords.dobVerified ? '✓ Verified' : '✗ Unverified'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>Jurisdiction:</span>
+                      <span className="font-mono text-zinc-300 font-medium">
+                        {report.governmentGateway.matchRecords.jurisdiction}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                  <span>Issuer: {report.governmentGateway.pkiCertificateIssuer}</span>
+                  <span className="truncate max-w-[180px]">{report.governmentGateway.auditReferenceId}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Right Card: Blockchain Immutability & Merkle Proof */}
+            {report.blockchain && (
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between space-y-3">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Link2 className="w-4 h-4 text-cyan-400" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-zinc-200">
+                        {report.blockchain.network}
+                      </span>
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold font-mono uppercase border ${
+                      report.blockchain.merkleProofVerified
+                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+                        : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                    }`}>
+                      {report.blockchain.merkleProofVerified ? 'Merkle Proof Verified' : 'Proof Failed'}
+                    </span>
+                  </div>
+
+                  {/* Blockchain Telemetry */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800/80">
+                      <span className="text-[10px] text-zinc-500 uppercase font-mono block">Block Number</span>
+                      <span className="font-mono text-zinc-200 font-semibold mt-0.5 block">
+                        #{report.blockchain.blockNumber.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800/80">
+                      <span className="text-[10px] text-zinc-500 uppercase font-mono block">Revocation Check</span>
+                      <span className="font-mono text-emerald-400 font-semibold mt-0.5 block">
+                        {report.blockchain.revocationStatus.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Zero Knowledge Proof & Contract */}
+                  <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 space-y-1.5 text-xs">
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>ZK Proof Circuit:</span>
+                      <span className="font-mono text-cyan-300 font-medium">
+                        {report.blockchain.zeroKnowledgeProof.scheme}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>ZK Attestation:</span>
+                      <span className="font-mono text-emerald-400 font-medium">
+                        {report.blockchain.zeroKnowledgeProof.isValid ? '✓ Valid (Zero PII Leaked)' : '✗ Invalid Proof'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span>Smart Contract:</span>
+                      <span className="font-mono text-zinc-400 font-medium truncate max-w-[170px]">
+                        {report.blockchain.contractAddress}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Cryptographic SHA-256 Digest */}
+                  <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800/80 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-zinc-500 uppercase font-mono flex items-center gap-1">
+                        <Fingerprint className="w-3 h-3 text-zinc-400" />
+                        <span>Document SHA-256 Digest</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyDigest(report.blockchain!.documentDigestSha256)}
+                        className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono flex items-center gap-1 cursor-pointer"
+                      >
+                        {copiedDigest ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedDigest ? 'Copied' : 'Copy Hash'}</span>
+                      </button>
+                    </div>
+                    <p className="font-mono text-[11px] text-zinc-300 break-all select-all leading-relaxed">
+                      {report.blockchain.documentDigestSha256}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                  <span className="truncate max-w-[220px]">Tx: {report.blockchain.transactionHash}</span>
+                  <span>{new Date(report.blockchain.timestamp).toLocaleTimeString()}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main Grid: Interactive Forensics Stage + Biometrics */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">

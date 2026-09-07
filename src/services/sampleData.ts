@@ -225,14 +225,14 @@ export const SAMPLE_PRESETS: SampleDocumentPreset[] = [
     title: 'Aadhaar Card (Authentic)',
     category: 'genuine',
     docType: 'aadhaar',
-    description: 'Genuine Aadhaar ID. Valid Verhoeff checksum (3675 9834 5012), no image tampering, authentic EXIF, matching live selfie.',
+    description: 'Genuine Aadhaar ID. Valid Verhoeff checksum (3675 9834 5017), no image tampering, authentic EXIF, matching live selfie.',
     expectedScore: 97,
     expectedRisk: 'low',
     docImage: createAadhaarSvg({
       name: 'AARAV SURESH SHARMA',
       dob: '14/08/1996',
       gender: 'MALE',
-      aadhaarNum: '3675 9834 5012', // Valid Verhoeff!
+      aadhaarNum: '3675 9834 5017', // Mathematically Valid UIDAI Verhoeff Checksum!
       avatarColor: '#1e3a8a'
     }),
     selfieImage: createSelfieSvg({ avatarColor: '#1e3a8a', isLivenessPassed: true }),
@@ -322,3 +322,5 @@ export const SAMPLE_PRESETS: SampleDocumentPreset[] = [
     }
   }
 ];
+
+export const SAMPLE_DOCUMENTS = SAMPLE_PRESETS;

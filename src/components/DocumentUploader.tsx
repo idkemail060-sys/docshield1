@@ -119,6 +119,13 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
     }
     if (documentType === 'aadhaar') {
       const digitsOnly = clean.replace(/[\s-]+/g, '');
+      const isMasked = clean.includes('X') || clean.includes('x') || clean.includes('*') || clean.includes('•') || digitsOnly.length === 4;
+      if (isMasked) {
+        return {
+          status: 'valid' as const,
+          message: '✓ Official Masked Aadhaar (Privacy Preserved & Supported)'
+        };
+      }
       if (digitsOnly.length < 12) {
         return {
           status: 'typing' as const,

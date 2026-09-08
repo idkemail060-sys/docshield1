@@ -219,7 +219,176 @@ function createSelfieSvg(options: {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`;
 }
 
+// Exact representation of User Uploaded Fake Document: Cristiano Ronaldo Aadhaar Spoof
+function createRonaldoSpoofSvg(): string {
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380">
+    <rect width="600" height="380" rx="12" fill="#faf8f5" stroke="#cbd5e1" stroke-width="2"/>
+    <g transform="translate(30, 25)">
+      <circle cx="18" cy="18" r="16" fill="#1e3a8a" opacity="0.1"/>
+      <path d="M18,6 L18,30 M10,14 L26,24 M10,24 L26,14" stroke="#1e3a8a" stroke-width="2"/>
+      <text x="50" y="16" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#334155">भारत सरकार</text>
+      <text x="50" y="32" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e293b">GOVERNMENT OF INDIA</text>
+    </g>
+    <!-- Tricolor brush strip -->
+    <rect x="220" y="28" width="350" height="12" rx="4" fill="#fb923c" opacity="0.8"/>
+    
+    <!-- Photo Box with Cristiano Ronaldo silhouette -->
+    <rect x="30" y="90" width="135" height="165" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="97" cy="150" r="38" fill="#0284c7"/>
+    <path d="M50,240 Q97,185 145,240 Z" fill="#0f172a"/>
+    <text x="97" y="225" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">CRISTIANO RONALDO</text>
+
+    <!-- Forgery text fields -->
+    <g transform="translate(190, 100)" font-family="Arial, sans-serif">
+      <text x="0" y="20" font-size="18" font-weight="bold" fill="#0f172a">Aadhaar <tspan fill="#ef4444">Fake!</tspan></text>
+      <text x="0" y="52" font-size="17" font-weight="bold" fill="#0f172a">Cristiano Ronaldo</text>
+      <text x="0" y="80" font-size="14" fill="#334155">Male</text>
+      <text x="0" y="108" font-size="14" fill="#334155">Patna, Bihar, India</text>
+    </g>
+
+    <!-- Invalid Verhoeff Checksum: 9876 5432 1098 -->
+    <rect x="180" y="235" width="380" height="42" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="370" y="263" font-family="'Courier New', monospace" font-size="24" font-weight="bold" fill="#b91c1c" text-anchor="middle" letter-spacing="3">
+      9876 5432 1098
+    </text>
+
+    <!-- Footer -->
+    <g transform="translate(30, 310)" font-family="Arial, sans-serif">
+      <text x="0" y="30" font-size="18" font-weight="bold" fill="#0f172a">आपका आधार</text>
+      <text x="240" y="22" font-size="14" font-weight="bold" fill="#0f172a">YOUR</text>
+      <text x="230" y="38" font-size="14" font-weight="bold" fill="#0f172a">AADHAAR</text>
+      <!-- Sun logo -->
+      <circle cx="480" cy="20" r="18" fill="#e05307"/>
+      <circle cx="480" cy="20" r="9" fill="#ffffff"/>
+      <text x="455" y="46" font-size="10" font-weight="bold" fill="#e05307">AADHAAR</text>
+    </g>
+  </svg>
+  `;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`;
+}
+
+// Exact representation of User Uploaded Original Document: Pranay Goswami e-Aadhaar Letter
+function createEaadhaarLetterSvg(): string {
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="480" height="780" viewBox="0 0 480 780">
+    <rect width="480" height="780" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <!-- Top banner -->
+    <rect x="10" y="10" width="460" height="85" fill="#ea580c"/>
+    <g transform="translate(30, 20)">
+      <circle cx="20" cy="20" r="16" fill="#ffffff" opacity="0.2"/>
+      <text x="50" y="22" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#ffffff">भारत सरकार</text>
+      <text x="50" y="42" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">Government of India</text>
+    </g>
+    <!-- UIDAI Green band -->
+    <rect x="10" y="98" width="460" height="38" fill="#15803d"/>
+    <text x="240" y="116" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">भारतीय विशिष्ट पहचान प्राधिकरण</text>
+    <text x="240" y="130" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Unique Identification Authority of India</text>
+
+    <!-- Enrolment Details -->
+    <g transform="translate(30, 155)" font-family="Arial, sans-serif">
+      <text x="0" y="15" font-size="11" font-weight="bold" fill="#0f172a">नामांकन क्रम / Enrolment No.: 0515/28813/00666</text>
+      <text x="0" y="40" font-size="10" fill="#64748b">To</text>
+      <text x="0" y="58" font-size="12" font-weight="bold" fill="#0f172a">प्रणय गोस्वामी / Pranay Goswami</text>
+      <text x="0" y="74" font-size="10" fill="#334155">S/O: Rajeshpuri Goswami</text>
+      <text x="0" y="88" font-size="10" fill="#334155">ward no 15 ramnagar colony seoni malwa</text>
+      <text x="0" y="102" font-size="10" fill="#334155">tehsil seoni malwa, Seoni-Malwa</text>
+      <text x="0" y="116" font-size="10" fill="#334155">Hoshangabad Madhya Pradesh - 461223</text>
+      <text x="0" y="130" font-size="10" font-weight="bold" fill="#0f172a">Mob: 9826969460</text>
+    </g>
+
+    <!-- Digital signature stamp placeholder with question mark -->
+    <g transform="translate(60, 345)">
+      <rect width="130" height="40" rx="4" fill="#fef9c3" stroke="#eab308" stroke-width="1"/>
+      <circle cx="20" cy="20" r="10" fill="#eab308"/>
+      <text x="17" y="24" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">?</text>
+      <text x="36" y="16" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#713f12">Signature Not Verified</text>
+      <text x="36" y="26" font-family="Arial, sans-serif" font-size="6" fill="#854d0e">DS UIDAI 05 (2022.05.10)</text>
+    </g>
+
+    <!-- High-density QR code block -->
+    <rect x="280" y="330" width="135" height="135" rx="6" fill="#0f172a"/>
+    <rect x="290" y="340" width="115" height="115" fill="#ffffff"/>
+    <circle cx="347" cy="397" r="18" fill="#0f172a"/>
+
+    <!-- Mid Letter Aadhaar Number -->
+    <g transform="translate(240, 500)" text-anchor="middle" font-family="Arial, sans-serif">
+      <text x="0" y="0" font-size="11" fill="#475569">आपका आधार क्रमांक / Your Aadhaar No. :</text>
+      <text x="0" y="28" font-family="'Courier New', monospace" font-size="22" font-weight="bold" fill="#0f172a" letter-spacing="3">6225 9242 6204</text>
+      <text x="0" y="46" font-size="10" fill="#64748b">VID : 9177 2255 9420 2645</text>
+      <text x="0" y="65" font-size="12" font-weight="bold" fill="#ea580c">मेरा आधार, मेरी पहचान</text>
+    </g>
+
+    <!-- Cut Line Marker with Scissor icon -->
+    <line x1="10" y1="580" x2="470" y2="580" stroke="#94a3b8" stroke-dasharray="6 4" stroke-width="1.5"/>
+    <text x="450" y="576" font-size="14">✂</text>
+
+    <!-- Bottom Cut-out Physical Card -->
+    <g transform="translate(20, 600)">
+      <rect width="440" height="165" rx="8" fill="#fdfefe" stroke="#cbd5e1"/>
+      <rect x="10" y="10" width="85" height="105" rx="6" fill="#e2e8f0" stroke="#94a3b8"/>
+      <!-- Portrait silhouette -->
+      <circle cx="52" cy="50" r="24" fill="#0369a1"/>
+      <path d="M22,105 Q52,75 82,105 Z" fill="#0369a1"/>
+      <text x="10" y="130" font-family="Arial, sans-serif" font-size="8" fill="#64748b">Issue: 25/01/2015</text>
+
+      <!-- Demographic details -->
+      <g transform="translate(110, 15)" font-family="Arial, sans-serif">
+        <text x="0" y="15" font-size="13" font-weight="bold" fill="#0f172a">प्रणय गोस्वामी</text>
+        <text x="0" y="32" font-size="12" font-weight="bold" fill="#0f172a">Pranay Goswami</text>
+        <text x="0" y="50" font-size="10" fill="#475569">जन्म तिथि/DOB: 15/12/2006</text>
+        <text x="0" y="66" font-size="10" fill="#475569">पुरुष/ MALE</text>
+      </g>
+
+      <!-- Bottom verified number -->
+      <text x="220" y="125" font-family="'Courier New', monospace" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle" letter-spacing="2">6225 9242 6204</text>
+      <text x="220" y="142" font-family="Arial, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">VID : 9177 2255 9420 2645</text>
+      <text x="220" y="156" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ea580c" text-anchor="middle">मेरा आधार, मेरी पहचान</text>
+    </g>
+  </svg>
+  `;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`;
+}
+
 export const SAMPLE_PRESETS: SampleDocumentPreset[] = [
+  {
+    id: 'user-original-eaadhaar',
+    title: 'UIDAI e-Aadhaar Letter (Original)',
+    category: 'genuine',
+    docType: 'aadhaar',
+    description: 'Authentic government e-Aadhaar sheet (Pranay Goswami). Valid Dihedral D5 Verhoeff checksum (6225 9242 6204), valid UIDAI digital signature stamp, and high-density 2D QR code.',
+    expectedScore: 98,
+    expectedRisk: 'low',
+    docImage: createEaadhaarLetterSvg(),
+    selfieImage: createSelfieSvg({ avatarColor: '#0369a1', isLivenessPassed: true }),
+    mockData: {
+      documentType: 'aadhaar',
+      documentName: 'Original_eAadhaar_Pranay_Goswami.jpeg',
+      authenticityScore: 98,
+      riskLevel: 'low',
+      decision: 'ACCEPT',
+      recommendation: 'Authentic UIDAI e-Aadhaar letter verified. All security features, digital signatures, and mathematical Verhoeff checksum pass.'
+    }
+  },
+  {
+    id: 'user-fake-ronaldo',
+    title: 'Aadhaar Meme/Spoof (Cristiano Ronaldo - Fake!)',
+    category: 'tampered',
+    docType: 'aadhaar',
+    description: 'Fake Aadhaar card with explicit "Fake!" red title, Cristiano Ronaldo photo, and invalid mathematical Verhoeff checksum (9876 5432 1098).',
+    expectedScore: 18,
+    expectedRisk: 'high',
+    docImage: createRonaldoSpoofSvg(),
+    selfieImage: createSelfieSvg({ avatarColor: '#0284c7', isLivenessPassed: true }),
+    mockData: {
+      documentType: 'aadhaar',
+      documentName: 'Fake_Aadhaar_Cristiano_Ronaldo.png',
+      authenticityScore: 18,
+      riskLevel: 'high',
+      decision: 'REJECT',
+      recommendation: 'Immediate rejection. Explicit fake document watermark, celebrity photo mismatch, and Verhoeff check digit failure.'
+    }
+  },
   {
     id: 'aadhaar-genuine',
     title: 'Aadhaar Card (Authentic)',

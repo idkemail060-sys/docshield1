@@ -15,12 +15,7 @@ function getAI(): GoogleGenAI | null {
   if (!process.env.GEMINI_API_KEY) return null;
   if (!aiClient) {
     aiClient = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
+      apiKey: process.env.GEMINI_API_KEY
     });
   }
   return aiClient;

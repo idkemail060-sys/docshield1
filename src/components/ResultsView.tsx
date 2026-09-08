@@ -75,10 +75,10 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
     : 'bg-red-500/10 text-red-400 border-red-500/20';
 
   const riskTitle = isLowRisk
-    ? 'LOW RISK (Likely Genuine)'
+    ? 'ORIGINAL DOCUMENT VERIFIED (Low Risk)'
     : isMediumRisk
     ? 'MEDIUM RISK (Manual Review Required)'
-    : 'HIGH RISK (Suspicious / Flagged)';
+    : 'FAKE / FORGED DOCUMENT DETECTED (High Risk)';
 
   // Export JSON Audit Certificate
   const handleExportJson = () => {
@@ -131,15 +131,6 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
 
         <div className="flex items-center gap-2">
           <button
-            id="btn-export-audit-json"
-            onClick={handleExportJson}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 text-xs font-semibold border border-blue-500/20 transition-all cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export Audit Certificate (JSON)</span>
-          </button>
-
-          <button
             id="btn-print-report"
             onClick={() => window.print()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold border border-zinc-700 transition-all cursor-pointer"
@@ -152,10 +143,10 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
 
       {/* Primary Score & Decision Bento Banner */}
       <div id="document-score-section" className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm scroll-mt-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-start xl:items-center justify-between gap-6">
           
           {/* Score Gauge Block */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 flex-1 min-w-0">
             <div className="relative flex items-center justify-center shrink-0">
               {/* Circular Gauge Meter */}
               <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 flex flex-col items-center justify-center shadow-lg transition-all ${
@@ -170,7 +161,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase border tracking-wide flex items-center gap-1.5 ${
                   isLowRisk 
@@ -244,35 +235,67 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
           </div>
 
           {/* Sub-scores Bento Grid Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 md:border-l md:border-zinc-800 md:pl-6">
-            <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Structural</span>
-              <div className="text-base font-bold text-zinc-100 mt-0.5">{report.subScores.structural}%</div>
-              <div className="text-[10px] text-zinc-500">Format & Regex</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto shrink-0 lg:border-l lg:border-zinc-800 lg:pl-6">
+            <div className="bg-zinc-950/90 p-3.5 sm:p-4 rounded-xl border border-zinc-800/90 min-w-[120px] sm:min-w-[130px] flex flex-col justify-between hover:border-zinc-700/80 transition-colors shadow-sm">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block whitespace-nowrap">Structural</span>
+              <div className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100 mt-1 whitespace-nowrap">
+                {report.subScores.structural}%
+              </div>
+              <div className="text-xs text-zinc-400 font-medium mt-1 whitespace-nowrap">Format & Regex</div>
+              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${report.subScores.structural >= 70 ? 'bg-emerald-500' : 'bg-rose-500'}`} 
+                  style={{ width: `${Math.min(Math.max(report.subScores.structural, 0), 100)}%` }} 
+                />
+              </div>
             </div>
             
-            <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Forensics</span>
-              <div className={`text-base font-bold mt-0.5 ${report.subScores.forensics >= 80 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className="bg-zinc-950/90 p-3.5 sm:p-4 rounded-xl border border-zinc-800/90 min-w-[120px] sm:min-w-[130px] flex flex-col justify-between hover:border-zinc-700/80 transition-colors shadow-sm">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block whitespace-nowrap">Forensics</span>
+              <div className={`text-xl sm:text-2xl font-bold tracking-tight mt-1 whitespace-nowrap ${
+                report.subScores.forensics >= 70 ? 'text-emerald-400' : 'text-rose-400'
+              }`}>
                 {report.subScores.forensics}%
               </div>
-              <div className="text-[10px] text-zinc-500">ELA & Tamper</div>
+              <div className="text-xs text-zinc-400 font-medium mt-1 whitespace-nowrap">ELA & Tamper</div>
+              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${report.subScores.forensics >= 70 ? 'bg-emerald-500' : 'bg-rose-500'}`} 
+                  style={{ width: `${Math.min(Math.max(report.subScores.forensics, 0), 100)}%` }} 
+                />
+              </div>
             </div>
 
-            <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Biometrics</span>
-              <div className={`text-base font-bold mt-0.5 ${report.subScores.biometrics >= 70 ? 'text-green-400' : 'text-amber-400'}`}>
+            <div className="bg-zinc-950/90 p-3.5 sm:p-4 rounded-xl border border-zinc-800/90 min-w-[120px] sm:min-w-[130px] flex flex-col justify-between hover:border-zinc-700/80 transition-colors shadow-sm">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block whitespace-nowrap">Biometrics</span>
+              <div className={`text-xl sm:text-2xl font-bold tracking-tight mt-1 whitespace-nowrap ${
+                report.subScores.biometrics >= 70 ? 'text-emerald-400' : 'text-amber-400'
+              }`}>
                 {report.subScores.biometrics}%
               </div>
-              <div className="text-[10px] text-zinc-500">Face Match</div>
+              <div className="text-xs text-zinc-400 font-medium mt-1 whitespace-nowrap">Face Match</div>
+              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${report.subScores.biometrics >= 70 ? 'bg-emerald-500' : 'bg-amber-500'}`} 
+                  style={{ width: `${Math.min(Math.max(report.subScores.biometrics, 0), 100)}%` }} 
+                />
+              </div>
             </div>
 
-            <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Metadata</span>
-              <div className={`text-base font-bold mt-0.5 ${report.subScores.metadata >= 70 ? 'text-green-400' : 'text-amber-400'}`}>
+            <div className="bg-zinc-950/90 p-3.5 sm:p-4 rounded-xl border border-zinc-800/90 min-w-[120px] sm:min-w-[130px] flex flex-col justify-between hover:border-zinc-700/80 transition-colors shadow-sm">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block whitespace-nowrap">Metadata</span>
+              <div className={`text-xl sm:text-2xl font-bold tracking-tight mt-1 whitespace-nowrap ${
+                report.subScores.metadata >= 70 ? 'text-emerald-400' : 'text-amber-400'
+              }`}>
                 {report.subScores.metadata}%
               </div>
-              <div className="text-[10px] text-zinc-500">EXIF Integrity</div>
+              <div className="text-xs text-zinc-400 font-medium mt-1 whitespace-nowrap">EXIF Integrity</div>
+              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${report.subScores.metadata >= 70 ? 'bg-emerald-500' : 'bg-amber-500'}`} 
+                  style={{ width: `${Math.min(Math.max(report.subScores.metadata, 0), 100)}%` }} 
+                />
+              </div>
             </div>
           </div>
 

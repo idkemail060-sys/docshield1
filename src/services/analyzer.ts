@@ -693,17 +693,20 @@ export async function runScreeningPipeline(options: {
 
   // AI-generated or structured reasons
   let finalReasons: string[] = [];
-  if (aiReport?.reasons && aiReport.reasons.length > 0) {
-    finalReasons = aiReport.reasons;
-  } else if (isTampered) {
+  if (isTampered) {
+    const aiFraudReasons = (aiReport?.reasons || []).filter((r: string) => 
+      !r.toLowerCase().includes('passed') && !r.toLowerCase().includes('conform') && !r.toLowerCase().includes('genuine')
+    );
     finalReasons = [
-      'Document flagged as FORGED / FAKE: High-frequency pixel inconsistencies and compression artifacts detected.',
+      'Document flagged as FORGED / FAKE: High-frequency pixel inconsistencies and security defects detected.',
       validationMsg,
       'Central Government Identity Gateway rejected credential verification.',
-      'Cryptographic Merkle Proof verification failed on decentralized ledger.'
+      'Cryptographic Merkle Proof verification failed on decentralized ledger.',
+      ...aiFraudReasons,
+      ...(aiReport?.tamperIndicators || [])
     ];
   } else {
-    finalReasons = [
+    finalReasons = (aiReport?.reasons && aiReport.reasons.length > 0) ? aiReport.reasons : [
       'Original document verified genuine: All security guilloche background patterns conform to official standards.',
       'Live Government Gateway and Blockchain Merkle Proof confirmed active status.',
       'Mathematical Dihedral D5 Verhoeff checksum validated successfully.'

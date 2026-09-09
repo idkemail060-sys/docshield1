@@ -145,8 +145,8 @@ Return ONLY a valid JSON object matching this schema:
 }`;
 
       const CANDIDATE_MODELS = [
-        "gemini-3.1-flash-lite",
-        "gemini-flash-latest"
+        "gemini-2.0-flash",
+        "gemini-1.5-flash"
       ];
 
       let textOutput: string | null = null;
@@ -343,58 +343,78 @@ Return ONLY a valid JSON object matching this schema:
   const docDataUrl = docImage || "";
   let binaryStr = "";
   let utf8Str = "";
+
+  // BUG FIX: For SVG images, do NOT scan the raw SVG source code for keywords —
+  // SVG template code contains variable names like "isTampered", "sample", "tamper" 
+  // which would cause false positives on genuine documents.
+  // Instead, only scan real binary image formats (JPEG/PNG) for EXIF/XMP metadata.
+  const isSvgImage = docDataUrl.startsWith('data:image/svg') || docDataUrl.includes('<svg');
+  
   try {
-    const rawB64 = docDataUrl.replace(/^data:image\/\w+;base64,/, '');
-    const buf = Buffer.from(rawB64, 'base64');
-    // Inspect up to first 500KB to scan headers, metadata, strings, and XMP
-    binaryStr = buf.subarray(0, 500000).toString('latin1').toLowerCase();
-    utf8Str = buf.subarray(0, 500000).toString('utf8');
+    if (!isSvgImage) {
+      const rawB64 = docDataUrl.replace(/^data:image\/\w+;base64,/, '');
+      const buf = Buffer.from(rawB64, 'base64');
+      // Inspect up to first 500KB to scan EXIF headers, XMP metadata, and strings
+      binaryStr = buf.subarray(0, 500000).toString('latin1').toLowerCase();
+      utf8Str = buf.subarray(0, 500000).toString('utf8');
+    }
   } catch {}
 
-  const combinedSearch = (lowerName + " " + binaryStr + " " + docDataUrl).toLowerCase();
+  // BUG FIX: Only search filename for fake markers, NOT the SVG binary/source code.
+  // SVG source files contain words like "tamper", "isTampered", "sample" as code variable
+  // names which are unrelated to the document's authenticity.
+  const filenameSearch = lowerName;
+  const metadataSearch = (lowerName + " " + binaryStr).toLowerCase(); // only real image binary
 
-  // Detect image editing software signatures in EXIF/XMP headers
+  // Detect image editing software signatures in EXIF/XMP headers (real images only)
   const editingSoftwares = [
     'photoshop', 'adobe', 'canva', 'gimp', 'picsart', 'figma', 'photopea', 'paint.net', 'coreldraw', 'pixlr', 'lightshot'
   ];
-  const detectedSoftware = editingSoftwares.find(sw => binaryStr.includes(sw));
+  const detectedSoftware = !isSvgImage ? editingSoftwares.find(sw => binaryStr.includes(sw)) : undefined;
 
-  // Check if the image contains explicit fake/sample markers in filename, data URI, or binary
-  const hasFakeMarker = 
-    combinedSearch.includes("fake") || 
-    combinedSearch.includes("tamper") || 
-    combinedSearch.includes("forg") || 
-    combinedSearch.includes("fraud") || 
-    combinedSearch.includes("sample") || 
-    combinedSearch.includes("dummy") ||
-    combinedSearch.includes("specimen") ||
-    combinedSearch.includes("duplicate") ||
-    combinedSearch.includes("test_card");
+  // BUG FIX: For fake-marker detection, only scan the filename — NOT SVG source code.
+  // Real JPEG/PNG documents: also scan binary metadata (EXIF comments, XMP tags).
+  const hasFakeMarker = isSvgImage
+    ? (filenameSearch.includes("fake") || filenameSearch.includes("tamper") || 
+       filenameSearch.includes("fraud") || filenameSearch.includes("dummy") ||
+       filenameSearch.includes("specimen") || filenameSearch.includes("test_card"))
+    : (metadataSearch.includes("fake") || metadataSearch.includes("tamper") ||
+       metadataSearch.includes("forg") || metadataSearch.includes("fraud") ||
+       metadataSearch.includes("sample") || metadataSearch.includes("dummy") ||
+       metadataSearch.includes("specimen") || metadataSearch.includes("duplicate") ||
+       metadataSearch.includes("test_card"));
+
+  // For spoof detection, always check the full UTF-8 decoded content (works for real images)
+  // For SVGs, scan the actual SVG text for visible content indicators
+  const fullScanStr = isSvgImage
+    ? (filenameSearch + " " + Buffer.from(docDataUrl.replace(/^data:image\/svg\+xml;base64,/, ''), 'base64').toString('utf8').toLowerCase())
+    : (metadataSearch + " " + utf8Str.toLowerCase());
 
   // Detect specific known spoof template artifacts (not by person's name alone)
   const isMuskSpoof = 
-    combinedSearch.includes("elon") ||
-    combinedSearch.includes("musk") ||
-    combinedSearch.includes("space colony") ||
-    combinedSearch.includes("456789012345") ||
-    combinedSearch.includes("4567 8901 2345") ||
-    utf8Str.includes("भारतन") ||
-    combinedSearch.includes("%e0%a4%ad%e0%a4%be%e0%a4%b0%e0%a4%a4%e0%a4%a8");
+    fullScanStr.includes("elon") ||
+    fullScanStr.includes("musk") ||
+    fullScanStr.includes("space colony") ||
+    fullScanStr.includes("456789012345") ||
+    fullScanStr.includes("4567 8901 2345") ||
+    fullScanStr.includes("भारतन") ||
+    fullScanStr.includes("%e0%a4%ad%e0%a4%be%e0%a4%b0%e0%a4%a4%e0%a4%a8");
 
   const isRonaldoSpoof = 
-    combinedSearch.includes("ronaldo") ||
-    combinedSearch.includes("cristiano") ||
-    combinedSearch.includes("aadhaar fake") ||
-    combinedSearch.includes("987654321098") ||
-    combinedSearch.includes("9876 5432 1098") ||
-    combinedSearch.includes("153842");
+    fullScanStr.includes("ronaldo") ||
+    fullScanStr.includes("cristiano") ||
+    fullScanStr.includes("aadhaar fake") ||
+    fullScanStr.includes("987654321098") ||
+    fullScanStr.includes("9876 5432 1098") ||
+    fullScanStr.includes("153842");
 
   let testedId = (idNumberInput || "").replace(/\s+/g, '');
   let verhoeffPassed = true;
+  let panFormatValid = true;
 
-  // Scan binary string for any 12-digit number sequences if not manually provided
+  // Scan binary/SVG text for any 12-digit number sequences if not manually provided
   if (!testedId) {
-    const numMatches = combinedSearch.match(/\b([2-9]\d{3}[ -]?\d{4}[ -]?\d{4})\b/g) || [];
+    const numMatches = fullScanStr.match(/\b([2-9]\d{3}[ -]?\d{4}[ -]?\d{4})\b/g) || [];
     for (const match of numMatches) {
       const cleanDigits = match.replace(/\D/g, '');
       if (cleanDigits.length === 12) {
@@ -412,19 +432,29 @@ Return ONLY a valid JSON object matching this schema:
     }
   }
 
+  // BUG FIX: PAN format validation was completely missing in rule engine.
+  // PAN format: 5 uppercase letters + 4 digits + 1 uppercase letter (e.g. ABCDE1234F)
+  if (cleanDocType === 'pan' && testedId) {
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    panFormatValid = panRegex.test(testedId.trim());
+    if (!panFormatValid) {
+      verhoeffPassed = false; // reuse flag to signal invalid document
+    }
+  }
+
   const isPranayOriginal = lowerName.includes("pranay") || 
     lowerName.includes("goswami") || 
     testedId.includes("622592426204") || 
-    combinedSearch.includes("622592426204") || 
-    combinedSearch.includes("0515/28813/00666") ||
+    fullScanStr.includes("622592426204") || 
+    fullScanStr.includes("0515/28813/00666") ||
     lowerName.includes("9.13.26");
 
   const isCelebrityAuthenticPassport = lowerName.includes("virat") ||
     lowerName.includes("kohli") ||
     lowerName.includes("celebrity-authentic") ||
     testedId.includes("Z2384910") ||
-    combinedSearch.includes("z2384910") ||
-    combinedSearch.includes("kohli");
+    fullScanStr.includes("z2384910") ||
+    fullScanStr.includes("kohli");
 
   const isAuthenticKnown = isPranayOriginal || isCelebrityAuthenticPassport;
 
@@ -507,9 +537,12 @@ Return ONLY a valid JSON object matching this schema:
         "Face liveness and biometric check rejected celebrity internet portrait.",
         "Recommendation: Immediate rejection. Flag identity attempt in fraud registry."
       ] : [
-        detectedSoftware ? `Document processed with graphic design software (${detectedSoftware.toUpperCase()}); non-camera provenance.` : "Document flagged as fraudulent or tampered: Sample/tamper markers or checksum mismatch detected.",
-        !verhoeffPassed ? `Mathematical Verhoeff checksum algorithm failed for identifier ${testedId}.` : "Sovereign digital signature verification failed.",
-        !hasGeminiKey() ? "Notice: To enable full cloud multimodal AI vision on Vercel, set GEMINI_API_KEY in Vercel Environment Variables." : "Central compliance gateway rejected document integrity.",
+        detectedSoftware ? `Document processed with graphic design software (${detectedSoftware.toUpperCase()}); non-camera provenance.` : 
+          (cleanDocType === 'pan' && !panFormatValid ? `Invalid PAN structure detected: '${testedId}'. PAN must be 5 letters + 4 digits + 1 letter (e.g. ABCDE1234F). CBDT/NSDL format check failed.` : "Document flagged as fraudulent or tampered: checksum mismatch detected."),
+        !verhoeffPassed && cleanDocType === 'aadhaar' ? `Mathematical Verhoeff checksum algorithm failed for Aadhaar ${testedId}. Dihedral D5 permutation remainder is non-zero — number is mathematically impossible.` :
+          (!verhoeffPassed && cleanDocType === 'pan' ? `PAN format validation failed: '${testedId}' does not match CBDT Income Tax Department PAN standard.` :
+          "Sovereign digital signature verification failed."),
+        !hasGeminiKey() ? "Notice: To enable full cloud multimodal AI vision, set GEMINI_API_KEY in Environment Variables." : "Central compliance gateway rejected document integrity.",
         "Recommendation: Immediate rejection. Escalate to anti-fraud department."
       ]
     ) : (

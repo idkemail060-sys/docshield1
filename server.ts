@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.get("/api/health", (req, res) => {
   res.json({
     status: "online",
-    hasGeminiKey: !!(process.env.GEMINI_API_KEY || "AQ.Ab8RN6KOOuSiwm5Dytku2VCongZ84E5ltgJ7NpdDd8MVTcaaxw"),
+    hasGeminiKey: !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString()
   });
 });

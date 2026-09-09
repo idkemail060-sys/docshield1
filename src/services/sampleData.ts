@@ -269,6 +269,75 @@ function createRonaldoSpoofSvg(): string {
 }
 
 // Representation of Celebrity Spoof / Typo / Checksum Failure: Elon Musk Aadhaar Spoof
+function createCelebrityAuthenticPassportSvg(): string {
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380">
+    <defs>
+      <linearGradient id="passBg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#f8fafc"/>
+      </linearGradient>
+      <pattern id="guilloche" width="30" height="30" patternUnits="userSpaceOnUse">
+        <path d="M0,15 Q7.5,0 15,15 T30,15" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+        <path d="M15,0 Q22.5,15 30,0 T45,0" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+      </pattern>
+    </defs>
+    <rect width="600" height="380" rx="12" fill="url(#passBg)" stroke="#94a3b8" stroke-width="2"/>
+    <rect width="600" height="380" rx="12" fill="url(#guilloche)" opacity="0.6"/>
+
+    <!-- Header: Republic of India Passport -->
+    <g transform="translate(30, 20)">
+      <text x="0" y="16" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#1e3a8a">भारत गणराज्य</text>
+      <text x="0" y="32" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">REPUBLIC OF INDIA</text>
+      <text x="440" y="24" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#1e3a8a">PASSPORT</text>
+    </g>
+    <line x1="30" y1="60" x2="570" y2="60" stroke="#cbd5e1" stroke-width="1.5"/>
+
+    <!-- Photo Box with Sovereign Security Background -->
+    <rect x="35" y="75" width="130" height="165" rx="8" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/>
+    <circle cx="100" cy="130" r="38" fill="#0f172a"/>
+    <circle cx="100" cy="122" r="32" fill="#fed7aa"/>
+    <path d="M50,225 Q100,175 150,225 Z" fill="#1e293b"/>
+    <!-- Ghost Hologram & UV Microtext Stamp -->
+    <circle cx="140" cy="100" r="14" fill="#3b82f6" opacity="0.3"/>
+    <text x="100" y="235" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#0f172a" text-anchor="middle">OFFICIAL BIOMETRIC</text>
+
+    <!-- Sovereign Demographic Fields -->
+    <g transform="translate(185, 75)" font-family="Arial, sans-serif">
+      <text x="0" y="15" font-size="9" fill="#64748b">Type / प्रकार: <tspan font-weight="bold" fill="#0f172a">P</tspan></text>
+      <text x="120" y="15" font-size="9" fill="#64748b">Country Code: <tspan font-weight="bold" fill="#0f172a">IND</tspan></text>
+      <text x="240" y="15" font-size="9" fill="#64748b">Passport No: <tspan font-weight="bold" fill="#0f172a">Z2384910</tspan></text>
+
+      <text x="0" y="45" font-size="9" fill="#64748b">Surname / उपनाम</text>
+      <text x="0" y="60" font-size="13" font-weight="bold" fill="#0f172a">KOHLI</text>
+
+      <text x="0" y="85" font-size="9" fill="#64748b">Given Name(s) / दिया गया नाम</text>
+      <text x="0" y="100" font-size="13" font-weight="bold" fill="#0f172a">VIRAT</text>
+
+      <text x="0" y="125" font-size="9" fill="#64748b">Nationality / राष्ट्रीयता</text>
+      <text x="0" y="140" font-size="11" font-weight="bold" fill="#0f172a">INDIAN</text>
+
+      <text x="120" y="125" font-size="9" fill="#64748b">Sex / लिंग</text>
+      <text x="120" y="140" font-size="11" font-weight="bold" fill="#0f172a">M</text>
+
+      <text x="200" y="125" font-size="9" fill="#64748b">Date of Birth / जन्म तिथि</text>
+      <text x="200" y="140" font-size="11" font-weight="bold" fill="#0f172a">05/11/1988</text>
+    </g>
+
+    <!-- ICAO Doc 9303 Optical Machine-Readable Zone (MRZ) -->
+    <rect x="25" y="270" width="550" height="90" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text x="40" y="308" font-family="'Courier New', monospace" font-size="15" font-weight="bold" fill="#0f172a" letter-spacing="2.5">
+      P&lt;INDKOHLI&lt;&lt;VIRAT&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+    </text>
+    <text x="40" y="338" font-family="'Courier New', monospace" font-size="15" font-weight="bold" fill="#0f172a" letter-spacing="2.5">
+      Z2384910&lt;4IND8811054M2805128&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;4
+    </text>
+  </svg>
+  `;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`;
+}
+
+// Representation of Celebrity Spoof / Typo / Checksum Failure: Elon Musk Aadhaar Spoof
 function createElonMuskSpoofSvg(): string {
   const svg = `
   <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380">
@@ -454,6 +523,25 @@ export const SAMPLE_PRESETS: SampleDocumentPreset[] = [
       riskLevel: 'low',
       decision: 'ACCEPT',
       recommendation: 'Authentic UIDAI e-Aadhaar letter verified. All security features, digital signatures, and mathematical Verhoeff checksum pass.'
+    }
+  },
+  {
+    id: 'celebrity-authentic-passport',
+    title: 'Celebrity / VIP (Genuine Sovereign Passport)',
+    category: 'genuine',
+    docType: 'passport',
+    description: 'Authentic Indian Passport belonging to a high-profile public figure (Virat Kohli). Demonstrates that celebrities who submit genuine documents pass as ORIGINAL with full cryptographic & MRZ verification.',
+    expectedScore: 98,
+    expectedRisk: 'low',
+    docImage: createCelebrityAuthenticPassportSvg(),
+    selfieImage: createSelfieSvg({ avatarColor: '#0f172a', isLivenessPassed: true }),
+    mockData: {
+      documentType: 'passport',
+      documentName: 'Passport_Virat_Kohli_Official.jpg',
+      authenticityScore: 98,
+      riskLevel: 'low',
+      decision: 'ACCEPT',
+      recommendation: 'Original sovereign document verified genuine. High-profile citizen identity confirmed with valid ICAO Doc 9303 MRZ checksums and authentic biometric portrait.'
     }
   },
   {

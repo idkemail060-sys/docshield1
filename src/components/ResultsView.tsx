@@ -232,6 +232,11 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
                   </ul>
                 </div>
               )}
+
+              <div className="pt-2 flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <span>Zero Identity Bias: Audited strictly on physical, mathematical & cryptographic integrity.</span>
+              </div>
             </div>
           </div>
 

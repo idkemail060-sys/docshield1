@@ -442,7 +442,7 @@ export async function runScreeningPipeline(options: {
         aiReport = await resp.json();
       }
     } catch (apiErr) {
-      console.warn('API /api/analyze-document offline or error, engaging deep client heuristics:', apiErr);
+      console.log('[Forensic Engine] Running client heuristics fallback:', apiErr);
     }
   }
 

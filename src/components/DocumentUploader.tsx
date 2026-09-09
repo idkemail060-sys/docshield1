@@ -754,11 +754,13 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                   </div>
                 )}
 
-                <img
-                  src={customDocImage}
-                  alt="Uploaded Document"
-                  className="max-h-[300px] w-auto object-contain rounded-lg shadow-inner"
-                />
+                {customDocImage ? (
+                  <img
+                    src={customDocImage}
+                    alt="Uploaded Document"
+                    className="max-h-[300px] w-auto object-contain rounded-lg shadow-inner"
+                  />
+                ) : null}
                 
                 {/* Document Status Ribbon */}
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
@@ -927,7 +929,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                     <span>Snap Photo</span>
                   </button>
                 </div>
-              ) : customSelfieImage ? (
+              ) : (customSelfieImage && customSelfieImage.trim() !== '') ? (
                 <div className="relative w-full flex items-center justify-center">
                   <img
                     src={customSelfieImage}

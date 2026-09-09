@@ -24,7 +24,8 @@ import {
   Check,
   Radio,
   KeyRound,
-  ExternalLink
+  ExternalLink,
+  User
 } from 'lucide-react';
 import { ScreeningReport, BoundingBox, ForensicSignal } from '../types';
 
@@ -554,11 +555,18 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
           {/* Document Canvas Stage */}
           <div className="relative rounded-xl border border-zinc-800 bg-zinc-950 p-3 min-h-[340px] flex items-center justify-center overflow-hidden">
             {/* Base Document Image */}
-            <img
-              src={report.documentImageUrl}
-              alt="Document"
-              className="max-h-[320px] w-auto object-contain rounded-lg shadow-md"
-            />
+            {report.documentImageUrl ? (
+              <img
+                src={report.documentImageUrl}
+                alt="Document"
+                className="max-h-[320px] w-auto object-contain rounded-lg shadow-md"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-zinc-500 py-12">
+                <FileText className="w-12 h-12 mb-2 text-zinc-600" />
+                <span className="text-xs font-mono">No Document Image Provided</span>
+              </div>
+            )}
 
             {/* Error Level Analysis (ELA) Heatmap Overlay */}
             {activeViewMode === 'ela' && report.elaHeatmapUrl && (
@@ -682,11 +690,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
               {/* Document Photo Crop */}
               <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-2.5 text-center">
                 <div className="relative h-32 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-900">
-                  <img
-                    src={report.documentImageUrl}
-                    alt="Document Portrait"
-                    className="w-full h-full object-cover"
-                  />
+                  {report.documentImageUrl ? (
+                    <img
+                      src={report.documentImageUrl}
+                      alt="Document Portrait"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FileText className="w-8 h-8 text-zinc-600" />
+                  )}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-16 h-20 border border-blue-400/60 rounded-full" />
                   </div>
@@ -700,19 +712,30 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ report, onReset }) => 
               {/* Live Selfie Capture */}
               <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-2.5 text-center">
                 <div className="relative h-32 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-900">
-                  <img
-                    src={report.selfieImageUrl}
-                    alt="Live Selfie"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-20 border border-green-400/60 rounded-full" />
-                  </div>
+                  {report.selfieImageUrl ? (
+                    <img
+                      src={report.selfieImageUrl}
+                      alt="Live Selfie"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-zinc-500 gap-1.5 p-2 text-center">
+                      <User className="w-8 h-8 text-zinc-600" />
+                      <span className="text-[10px] font-mono leading-tight">Optional Selfie Not Provided</span>
+                    </div>
+                  )}
+                  {report.selfieImageUrl && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-20 border border-green-400/60 rounded-full" />
+                    </div>
+                  )}
                 </div>
                 <span className="block text-[11px] font-semibold text-zinc-300 mt-2">
                   Live Selfie
                 </span>
-                <span className="text-[10px] text-green-400 font-medium font-mono">Liveness Verified</span>
+                <span className="text-[10px] text-zinc-400 font-medium font-mono">
+                  {report.selfieImageUrl ? 'Liveness Verified' : 'Demo Facial Vector'}
+                </span>
               </div>
             </div>
 

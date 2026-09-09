@@ -93,6 +93,38 @@ const DOCUMENT_OPTIONS: DocTypeOption[] = [
   }
 ];
 
+// Helper to auto-resize client images to max 1280px to comply with Vercel 4.5MB payload limits
+async function compressImageForForensics(dataUrl: string, maxDimension = 1280): Promise<string> {
+  if (!dataUrl || !dataUrl.startsWith('data:image/') || dataUrl.includes('image/svg+xml')) {
+    return dataUrl;
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width <= maxDimension && height <= maxDimension && dataUrl.length < 400000) {
+        return resolve(dataUrl);
+      }
+      if (width > height && width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else if (height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(dataUrl);
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
   onStartScreening,
   isProcessing
@@ -189,15 +221,16 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
 
           e.preventDefault();
           const reader = new FileReader();
-          reader.onload = () => {
+          reader.onload = async () => {
             if (typeof reader.result === 'string') {
+              const compressed = await compressImageForForensics(reader.result);
               if (!customDocImage) {
-                setCustomDocImage(reader.result);
+                setCustomDocImage(compressed);
                 setFileName(file.name || `Pasted_Document_${Date.now().toString().slice(-4)}.png`);
-                setUploadNotification('Document successfully pasted from clipboard (Ctrl+V)!');
+                setUploadNotification('Document successfully pasted and optimized for screening!');
               } else {
-                setCustomSelfieImage(reader.result);
-                setUploadNotification('Portrait photo successfully pasted from clipboard (Ctrl+V)!');
+                setCustomSelfieImage(compressed);
+                setUploadNotification('Portrait photo successfully pasted and optimized!');
               }
               setUploadError(null);
             }
@@ -219,10 +252,11 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
     setUploadError(null);
     setFileName(file.name);
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       if (typeof reader.result === 'string') {
-        setCustomDocImage(reader.result);
-        setUploadNotification(`Document loaded: ${file.name}`);
+        const compressed = await compressImageForForensics(reader.result);
+        setCustomDocImage(compressed);
+        setUploadNotification(`Document loaded & optimized for verification: ${file.name}`);
       }
     };
     reader.readAsDataURL(file);
@@ -232,9 +266,10 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
   const processSelfieFile = (file: File) => {
     setUploadError(null);
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       if (typeof reader.result === 'string') {
-        setCustomSelfieImage(reader.result);
+        const compressed = await compressImageForForensics(reader.result);
+        setCustomSelfieImage(compressed);
         setUploadNotification(`Portrait photo loaded: ${file.name}`);
         stopCamera();
       }
@@ -254,15 +289,16 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
             foundImage = true;
             const blob = await item.getType(imageType);
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = async () => {
               if (typeof reader.result === 'string') {
+                const compressed = await compressImageForForensics(reader.result);
                 if (target === 'doc') {
-                  setCustomDocImage(reader.result);
+                  setCustomDocImage(compressed);
                   setFileName(`Clipboard_${documentType}_${Date.now().toString().slice(-4)}.png`);
-                  setUploadNotification('Document successfully pasted from clipboard!');
+                  setUploadNotification('Document successfully pasted and optimized!');
                 } else {
-                  setCustomSelfieImage(reader.result);
-                  setUploadNotification('Portrait photo successfully pasted from clipboard!');
+                  setCustomSelfieImage(compressed);
+                  setUploadNotification('Portrait photo successfully pasted and optimized!');
                 }
                 setUploadError(null);
               }
@@ -297,15 +333,16 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         e.preventDefault();
         e.stopPropagation();
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = async () => {
           if (typeof reader.result === 'string') {
+            const compressed = await compressImageForForensics(reader.result);
             if (target === 'doc') {
-              setCustomDocImage(reader.result);
+              setCustomDocImage(compressed);
               setFileName(file.name || `Pasted_Document_${Date.now().toString().slice(-4)}.png`);
-              setUploadNotification('Document pasted from clipboard!');
+              setUploadNotification('Document pasted and optimized!');
             } else {
-              setCustomSelfieImage(reader.result);
-              setUploadNotification('Photo pasted from clipboard!');
+              setCustomSelfieImage(compressed);
+              setUploadNotification('Photo pasted and optimized!');
             }
             setUploadError(null);
           }

@@ -268,6 +268,73 @@ function createRonaldoSpoofSvg(): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`;
 }
 
+// Representation of Celebrity Spoof / Typo / Checksum Failure: Elon Musk Aadhaar Spoof
+function createElonMuskSpoofSvg(): string {
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380">
+    <defs>
+      <linearGradient id="muskBg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#fff8f0"/>
+      </linearGradient>
+    </defs>
+    <!-- Card Base -->
+    <rect width="600" height="380" rx="14" fill="url(#muskBg)" stroke="#cbd5e1" stroke-width="2"/>
+    
+    <!-- Top Emblem and Corrupted Typo Header: "भारतन सरकार" -->
+    <g transform="translate(35, 25)">
+      <circle cx="18" cy="18" r="16" fill="#1e3a8a" opacity="0.12"/>
+      <path d="M18,6 L18,30 M10,14 L26,24 M10,24 L26,14" stroke="#1e3a8a" stroke-width="2"/>
+      <!-- Corrupted Header Typo -->
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#b91c1c">भारतन सरकार</text>
+      <text x="45" y="32" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e293b">GOVERNMENT OF INDIA</text>
+    </g>
+
+    <!-- Tricolor strip -->
+    <rect x="230" y="26" width="335" height="10" rx="4" fill="#fb923c" opacity="0.85"/>
+    
+    <!-- Portrait Box: Elon Musk Portrait -->
+    <rect x="35" y="85" width="135" height="165" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="102" cy="140" r="38" fill="#1e293b"/>
+    <circle cx="102" cy="132" r="32" fill="#fed7aa"/>
+    <path d="M72,125 Q102,85 132,125 Q115,105 88,105 Z" fill="#475569"/>
+    <path d="M50,240 Q102,185 155,240 Z" fill="#0f172a"/>
+    <text x="102" y="222" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">ELON MUSK</text>
+
+    <!-- Spoof Demographics & Absurd Address -->
+    <g transform="translate(195, 95)" font-family="Arial, sans-serif">
+      <text x="0" y="22" font-size="19" font-weight="bold" fill="#0f172a">Elon Musk</text>
+      <text x="0" y="48" font-size="14" fill="#334155">जन्म तिथि / DOB: 28/06/1971</text>
+      <text x="0" y="70" font-size="14" fill="#334155">लिंग / Gender: Male</text>
+      <text x="0" y="96" font-size="13" font-weight="bold" fill="#b91c1c">पता / Address: 789, Space Colony</text>
+      <text x="0" y="115" font-size="12" fill="#64748b">Near Launchpad, Mars Province</text>
+    </g>
+
+    <!-- QR code simulation -->
+    <g transform="translate(480, 110)">
+      <rect width="80" height="80" rx="4" fill="#0f172a"/>
+      <rect x="6" y="6" width="68" height="68" fill="#ffffff"/>
+      <rect x="15" y="15" width="20" height="20" fill="#0f172a"/>
+      <rect x="45" y="15" width="20" height="20" fill="#0f172a"/>
+      <rect x="15" y="45" width="20" height="20" fill="#0f172a"/>
+    </g>
+
+    <!-- Invalid Verhoeff Checksum: 4567 8901 2345 -->
+    <rect x="35" y="265" width="530" height="46" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="300" y="297" font-family="'Courier New', monospace" font-size="25" font-weight="bold" fill="#b91c1c" text-anchor="middle" letter-spacing="3">
+      4567 8901 2345
+    </text>
+
+    <!-- Slogan & UIDAI Logo -->
+    <g transform="translate(35, 335)" font-family="Arial, sans-serif">
+      <text x="0" y="20" font-size="14" font-weight="bold" fill="#ea580c">मेरा आधार, मेरी पहचान</text>
+      <text x="440" y="20" font-size="11" font-weight="bold" fill="#64748b">UIDAI Mockup</text>
+    </g>
+  </svg>
+  `;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`;
+}
+
 // Exact representation of User Uploaded Original Document: Pranay Goswami e-Aadhaar Letter
 function createEaadhaarLetterSvg(): string {
   const svg = `
@@ -351,6 +418,25 @@ function createEaadhaarLetterSvg(): string {
 }
 
 export const SAMPLE_PRESETS: SampleDocumentPreset[] = [
+  {
+    id: 'user-fake-elon-musk',
+    title: 'Aadhaar Meme/Spoof (Elon Musk - Fake Typo Card)',
+    category: 'tampered',
+    docType: 'aadhaar',
+    description: 'Counterfeit Aadhaar spoof with celebrity photo (Elon Musk), typo header "भारतन सरकार", fictional address "789, Space Colony", and mathematically invalid Verhoeff checksum (4567 8901 2345).',
+    expectedScore: 12,
+    expectedRisk: 'high',
+    docImage: createElonMuskSpoofSvg(),
+    selfieImage: createSelfieSvg({ avatarColor: '#1e293b', isLivenessPassed: true }),
+    mockData: {
+      documentType: 'aadhaar',
+      documentName: 'Fake_Aadhaar_Elon_Musk.png',
+      authenticityScore: 12,
+      riskLevel: 'high',
+      decision: 'REJECT',
+      recommendation: 'Immediate rejection. Counterfeit template: celebrity biometric spoof, misspelled government header (भारतन सरकार), absurd address (Space Colony), and failed Verhoeff checksum.'
+    }
+  },
   {
     id: 'user-original-eaadhaar',
     title: 'UIDAI e-Aadhaar Letter (Original)',

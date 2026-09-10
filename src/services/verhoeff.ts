@@ -66,28 +66,6 @@ export function generateVerhoeffCheckDigit(numStr: string): number {
   return inv_table[c];
 }
 
-/**
- * Creates a valid 12-digit Aadhaar number with correct Verhoeff check digit
- */
-export function createValidAadhaarNumber(prefix11 = '36759834501'): string {
-  const clean = prefix11.replace(/[\s-]+/g, '').slice(0, 11);
-  const padded = clean.padEnd(11, '0');
-  const checkDigit = generateVerhoeffCheckDigit(padded);
-  const full = padded + checkDigit;
-  return `${full.slice(0, 4)} ${full.slice(4, 8)} ${full.slice(8, 12)}`;
-}
-
-/**
- * Generates an invalid 12-digit Aadhaar number with intentionally corrupted check digit for fraud testing
- */
-export function createInvalidAadhaarNumber(prefix11 = '36759834501'): string {
-  const clean = prefix11.replace(/[\s-]+/g, '').slice(0, 11);
-  const padded = clean.padEnd(11, '0');
-  const checkDigit = generateVerhoeffCheckDigit(padded);
-  const corruptDigit = (checkDigit + 1) % 10;
-  const full = padded + corruptDigit;
-  return `${full.slice(0, 4)} ${full.slice(4, 8)} ${full.slice(8, 12)}`;
-}
 
 /**
  * Indian PAN Card format validation:

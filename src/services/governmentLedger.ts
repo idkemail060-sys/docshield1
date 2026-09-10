@@ -45,7 +45,7 @@ export async function queryGovernmentIdentityGateway(options: {
   dob?: string;
   isTamperedImage?: boolean;
 }): Promise<GovernmentGatewayVerification> {
-  const { documentType, extractedId, extractedName = 'CITIZEN', dob = '01/01/1990', isTamperedImage = false } = options;
+  const { documentType, extractedId, extractedName = '', dob = '', isTamperedImage = false } = options;
   const startTime = Date.now();
 
   let authority = 'National Identity Registry Gateway';

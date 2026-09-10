@@ -11,6 +11,7 @@ import { PipelineProgress } from './components/PipelineProgress';
 import { ResultsView } from './components/ResultsView';
 import { ComplianceModal } from './components/ComplianceModal';
 import { AboutUsModal } from './components/AboutUsModal';
+import { BlockchainSecurityModal } from './components/BlockchainSecurityModal';
 import { DocumentType, ScreeningReport, AuditLogEntry } from './types';
 import { runScreeningPipeline } from './services/analyzer';
 
@@ -72,6 +73,7 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOGS);
   const [isComplianceOpen, setIsComplianceOpen] = useState<boolean>(false);
   const [isAboutUsOpen, setIsAboutUsOpen] = useState<boolean>(false);
+  const [isBlockchainSecurityOpen, setIsBlockchainSecurityOpen] = useState<boolean>(false);
 
   // Stored pending parameters during the stage animation
   const [pendingParams, setPendingParams] = useState<{
@@ -166,6 +168,7 @@ export default function App() {
       <Navbar
         onOpenCompliance={() => setIsComplianceOpen(true)}
         onOpenAboutUs={() => setIsAboutUsOpen(true)}
+        onOpenBlockchainSecurity={() => setIsBlockchainSecurityOpen(true)}
         totalScreeningsCount={auditLogs.length}
       />
 
@@ -213,28 +216,36 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#09090b] border-t border-zinc-800/80 py-4 text-center text-xs text-zinc-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="bg-[#000000]/80 backdrop-blur-2xl border-t border-white/[0.08] py-4 text-center text-xs text-zinc-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-zinc-400">DocShield Enterprise</span>
+            <span className="w-2 h-2 rounded-full bg-[#34C759] animate-pulse"></span>
+            <span className="text-zinc-300 font-medium">DocShield Enterprise</span>
             <span className="text-zinc-600">•</span>
             <span>Smart India Hackathon (SIH26188)</span>
             <span className="text-zinc-600">•</span>
             <button
               id="btn-footer-about-us"
               onClick={() => setIsAboutUsOpen(true)}
-              className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer font-medium underline underline-offset-4 decoration-blue-500/40 hover:decoration-blue-400"
+              className="text-[#007AFF] hover:text-[#409cff] transition-colors cursor-pointer font-medium underline underline-offset-4 decoration-[#007AFF]/40 hover:decoration-[#007AFF]"
             >
               About Team TechForge
             </button>
           </div>
-          <div className="flex items-center gap-4 text-[11px] font-mono">
+          <div className="flex items-center gap-3 text-[11px] font-mono">
             <span>NIST SP 800-63A</span>
             <span className="text-zinc-600">•</span>
-            <span className="text-green-400 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">
-              RAM_ONLY_MODE: ENABLED (0 KB DISK)
+            <span className="text-[#34C759] bg-[#34C759]/15 px-2.5 py-0.5 rounded-full border border-[#34C759]/25">
+              RAM_ONLY_MODE: ACTIVE (0 KB DISK)
             </span>
+            <span className="text-zinc-600">•</span>
+            <button
+              id="btn-footer-blockchain"
+              onClick={() => setIsBlockchainSecurityOpen(true)}
+              className="text-[#007AFF] hover:text-[#409cff] transition-colors cursor-pointer font-medium underline underline-offset-4 decoration-[#007AFF]/40 hover:decoration-[#007AFF]"
+            >
+              Blockchain & Cryptography Spec
+            </button>
           </div>
         </div>
       </footer>
@@ -249,6 +260,12 @@ export default function App() {
       <AboutUsModal
         isOpen={isAboutUsOpen}
         onClose={() => setIsAboutUsOpen(false)}
+      />
+
+      {/* Blockchain & Cybersecurity Architecture Modal */}
+      <BlockchainSecurityModal
+        isOpen={isBlockchainSecurityOpen}
+        onClose={() => setIsBlockchainSecurityOpen(false)}
       />
 
     </div>

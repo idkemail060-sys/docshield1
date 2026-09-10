@@ -104,54 +104,54 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ onComplete }
   const progressPct = Math.round(((completedStages.length) / PIPELINE_STAGES.length) * 100);
 
   return (
-    <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6 shadow-sm max-w-3xl mx-auto my-6">
+    <div className="bg-[#1c1c1e]/90 backdrop-blur-2xl rounded-3xl border border-white/[0.08] p-6 sm:p-7 shadow-2xl max-w-3xl mx-auto my-6">
       
       {/* Top Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <span className="text-xs uppercase tracking-widest text-zinc-500 font-bold">
+          <span className="text-xs uppercase tracking-widest text-zinc-400 font-bold">
             Real-Time In-Memory Execution
           </span>
-          <h2 className="text-xl font-bold text-zinc-100 mt-0.5 tracking-tight">
+          <h2 className="text-xl font-bold text-white mt-0.5 tracking-tight">
             Running Multi-Layer Forensic & Biometric Pipeline
           </h2>
         </div>
         <div className="text-right">
-          <span className="text-2xl font-mono font-bold text-blue-400">{progressPct}%</span>
-          <p className="text-[11px] text-zinc-500 font-mono">RAM Stream Active</p>
+          <span className="text-2xl font-mono font-bold text-[#007AFF]">{progressPct}%</span>
+          <p className="text-[11px] text-zinc-400 font-mono">RAM Stream Active</p>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="w-full bg-zinc-800 rounded-full h-2 mb-6 overflow-hidden">
+      {/* Progress Bar (iOS Track) */}
+      <div className="w-full bg-[#2c2c2e] rounded-full h-2.5 mb-6 overflow-hidden">
         <div 
-          className="bg-blue-600 h-2 rounded-full transition-all duration-300 shadow-sm shadow-blue-500/50"
+          className="bg-[#007AFF] h-2.5 rounded-full transition-all duration-300 shadow-sm shadow-blue-500/40"
           style={{ width: `${progressPct}%` }}
         />
       </div>
 
       {/* Current Active Stage Highlight Bento Box */}
-      <div className="rounded-xl bg-zinc-950 border border-zinc-800 p-4 mb-6">
+      <div className="rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.08] p-4.5 mb-6">
         <div className="flex items-start gap-3">
-          <RefreshCw className="w-4 h-4 text-blue-400 animate-spin shrink-0 mt-0.5" />
+          <RefreshCw className="w-4 h-4 text-[#007AFF] animate-spin shrink-0 mt-0.5" />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#007AFF] uppercase tracking-wider">
                 {activeStage.category}: {activeStage.name}
               </span>
-              <span className="text-[11px] text-zinc-500 font-mono">In-Memory Buffer</span>
+              <span className="text-[11px] text-zinc-400 font-mono">In-Memory Buffer</span>
             </div>
             <p className="text-sm text-zinc-200 mt-1 font-medium">
               {activeStage.description}
             </p>
-            <p className="text-xs text-zinc-400 font-mono mt-2 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+            <p className="text-xs text-zinc-300 font-mono mt-2 bg-[#1c1c1e] px-3 py-1.5 rounded-xl border border-white/[0.06]">
               ⚡ {activeStage.subAction}...
             </p>
           </div>
         </div>
       </div>
 
-      {/* Stage Checklist */}
+      {/* Stage Checklist (iOS Grouped List) */}
       <div className="space-y-2">
         {PIPELINE_STAGES.map((stage, idx) => {
           const isDone = completedStages.includes(idx);
@@ -160,25 +160,25 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ onComplete }
           return (
             <div
               key={stage.id}
-              className={`flex items-center justify-between p-2.5 rounded-lg border text-xs transition-all ${
+              className={`flex items-center justify-between p-3 rounded-2xl border text-xs transition-all ${
                 isDone
-                  ? 'bg-zinc-950 border-zinc-800 text-zinc-300'
+                  ? 'bg-[#1c1c1e] border-white/[0.04] text-zinc-300'
                   : isCurrent
-                  ? 'bg-zinc-900 border-blue-500/50 text-zinc-100 font-medium'
-                  : 'bg-zinc-950/40 border-zinc-800/40 text-zinc-600'
+                  ? 'bg-[#007AFF]/15 border-[#007AFF]/50 text-white font-medium shadow-sm'
+                  : 'bg-[#1c1c1e]/40 border-white/[0.03] text-zinc-600'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 {isDone ? (
-                  <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#34C759] shrink-0 stroke-[2.2]" />
                 ) : isCurrent ? (
-                  <RefreshCw className="w-4 h-4 text-blue-400 animate-spin shrink-0" />
+                  <RefreshCw className="w-4 h-4 text-[#007AFF] animate-spin shrink-0" />
                 ) : (
-                  <Clock className="w-4 h-4 text-zinc-700 shrink-0" />
+                  <Clock className="w-4 h-4 text-zinc-600 shrink-0" />
                 )}
-                <span>{stage.name}</span>
+                <span className={isCurrent ? 'text-white' : ''}>{stage.name}</span>
               </div>
-              <span className="text-[11px] font-mono text-zinc-500">
+              <span className="text-[11px] font-mono text-zinc-400">
                 {isDone ? 'COMPLETED' : isCurrent ? 'PROCESSING...' : 'QUEUED'}
               </span>
             </div>

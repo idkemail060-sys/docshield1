@@ -180,16 +180,3 @@ export interface AuditLogEntry {
   executionTimeMs: number;
   storageMode: 'RAM_ONLY_NO_PERSISTENCE';
 }
-
-export interface SampleDocumentPreset {
-  id: string;
-  title: string;
-  category: 'genuine' | 'tampered' | 'invalid_checksum' | 'synthetic';
-  docType: DocumentType;
-  description: string;
-  expectedScore: number;
-  expectedRisk: RiskLevel;
-  docImage: string;
-  selfieImage: string;
-  mockData: Partial<ScreeningReport>;
-}
